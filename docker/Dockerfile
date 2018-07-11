@@ -1,26 +1,32 @@
-FROM python:3.6
+FROM debian:stretch
 
-# Add overviewer repo, install overviewer and nginx
-RUN apt-add-repository 'deb http://overviewer.org/debian ./'                  && \
-    wget -O - http://overviewer.org/debian/overviewer.gpg.asc | apt-key add - && \
-    apt-get update                                                            && \
-    apt-get install -y nginx minecraft-overviewer                             && \
-    apt-get clean                                                             && \
-    echo 'daemon off;' >> /etc/nginx/nginx.conf
+RUN apt-get update
 
-# Copy python requirements and install them
+# Install base dependencies
 COPY requirements.txt /tmp/
-RUN pip3 install --no-cache-dir --upgrade -r /tmp/requirements.txt
+RUN apt-get install -y python3.5 && \
+    pip3 install --no-cache-dir --upgrade -r /tmp/requirements.txt
 
-# Copy common configuration
+# Install Overviewer
+RUN apt-get install -y wget gnupg                                              && \
+    echo "deb http://overviewer.org/debian ./" >> /etc/apt/sources.list        && \
+    wget -O - https://overviewer.org/debian/overviewer.gpg.asc | apt-key add - && \
+    apt-get update                                                             && \
+    apt-get install -y minecraft-overviewer                                    && \
+
+# Install nginx.
+# 'daemon off' prevents nginx from daemonizing, thus first called process
+# remains alive, helping Docker to watch it.
+RUN apt-get install -y nginx                    && \
+    echo 'daemon off;' >> /etc/nginx/nginx.conf
+COPY config.nginx /etc/nginx/sites-enabled/
+
+# Clean everything after installation
+RUN apt-get clean                                 && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Move main container infrastructure scripts
 COPY ../configuration.json /
-
-# Copy nginx configuration
-COPY minemap.nginx /etc/nginx/sites-enabled/
-
-# Copy implementation scripts
 COPY impl /
-
-# Copy and set entrypoint script
-COPY minemap_entry.sh /
-CMD ["/minemap_entry.sh"]
+COPY entry.sh /
+CMD ["/entry.sh"]

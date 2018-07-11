@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import json
 import requests
 
@@ -15,4 +15,5 @@ auth_request_data = {
 auth_request_url = 'https://authserver.mojang.com/authenticate'
 auth_request = requests.post(auth_request_url, json.dumps(auth_request_data))
 
-auth_response = json.load(auth_request.text)
+auth_response = json.loads(auth_request.text)
+print(auth_response)

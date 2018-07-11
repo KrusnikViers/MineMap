@@ -1,2 +1,2 @@
 # Actual configuration with credentials should never be added to git.
-/configuration.json
+docker/configuration.json

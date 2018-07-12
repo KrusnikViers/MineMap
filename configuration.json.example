@@ -1,6 +1,5 @@
 {
   "email": "email@at.com",
   "password": "password",
-  "world_name": "My very World",
-  "update_period_minutes": 30,
+  "version": "1.5.0"
 }

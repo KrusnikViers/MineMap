@@ -11,6 +11,6 @@ server {
     error_log /var/log/nginx/error.log crit
 
     location / {
-        alias /overviewer/current;
+        alias /public;
     }
 }

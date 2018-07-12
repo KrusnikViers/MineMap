@@ -3,11 +3,9 @@ import crontab
 import json
 import os
 
-with open('/configuration.json') as configuration_file:
-    configuration = json.load(configuration_file)
-print(configuration)
+from refresh import rebuild_map
 
-os.system("/impl/refresh.py")
+rebuild_map()
 
 # user_cron  = crontab.CronTab(user=True)
 # job = cron.new(command='/usr/bin/python /impl/refresh.py')

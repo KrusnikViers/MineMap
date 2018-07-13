@@ -1,4 +1,4 @@
-worlds["myworld"] = "/impl/rendering/world"
+worlds["myworld"] = "/rendering/world"
 
 renders["daytime"] = {
     "world": "myworld",

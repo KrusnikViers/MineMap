@@ -20,7 +20,7 @@ RUN apt-get install -y nginx && echo 'daemon off;' >> /etc/nginx/nginx.conf
 COPY config.nginx /etc/nginx/sites-enabled/
 
 # Install tools and textures
-RUN apt-get install git curl jq                                 && \
+RUN apt-get -y install git curl jq                              && \
     mkdir /tools                                                && \
     git clone https://github.com/air/minecraft-tools.git /tools && \
     /tools/overviewer/get-minecraft-client-jar.sh
@@ -31,5 +31,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Move main container infrastructure scripts
 COPY configuration.json /
 COPY impl /impl
+
+RUN mkdir /public
+RUN mkdir /rendering
+
 COPY entry.sh /
 CMD ["/entry.sh"]

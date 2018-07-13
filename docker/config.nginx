@@ -8,7 +8,7 @@ server {
     reset_timedout_connection on;
 
     access_log off;
-    error_log /var/log/nginx/error.log crit
+    error_log /var/log/nginx/error.log crit;
 
     location / {
         alias /public;

@@ -15,7 +15,7 @@ def post(url: str, data):
   return json.loads(request.text)
 
 def download(url: str, location: str):
-  request = requests.get(download_link, stream=True)
+  request = requests.get(url, stream=True)
   if request.status_code == 200:
     os.makedirs(os.path.dirname(location), exist_ok=True)
     print('Download from {} to {}'.format(url, os.path.dirname(location)))

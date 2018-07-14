@@ -17,7 +17,7 @@ def post(url: str, data):
 def download(url: str, location: str):
   os.makedirs(os.path.dirname(location), exist_ok=True)
   print('Download from {} to {}...'.format(
-      ((url[:32] + '..') if len(url) > 35 else url),
+      ((url[:70] + '..') if len(url) > 70 else url),
       os.path.dirname(location)))
   request = requests.get(url, stream=True)
   if request.status_code == 200:

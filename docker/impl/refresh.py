@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import json
-import os
+import subprocess
 
 import net_util
 
@@ -41,17 +41,17 @@ def _download_world_to_file(auth_data):
   net_util.download(download_link, '/rendering/world.tar.gz')
 
 
-# def _publish_map():
-#   os.system('cd /impl/rendering')
-#   os.system('gunzip rendering/world.tar.gz')
-#   os.system('tar xvf world.tar')
-#   os.system('overviewer.py --config=/impl/config.py')
+def _publish_map():
+  return subprocess.run('gunzip -c /rendering/world.tar.gz > /rendering/wolrd.tar').returncode or
+         subprocess.run('mkdir -p /rendering/world').returncode or
+         subprocess.run('tar -xvf /rendering/world.tar -C /rendering/world').returncode or
+         subprocess.run('overviewer.py --config=/bin/config.py').returncode
 
 
 def rebuild_map():
   auth_data = _request_authentication()
   _download_world_to_file(auth_data)
-  # _publish_map()
+  _publish_map()
 
 
 if __name__ == "__main__":

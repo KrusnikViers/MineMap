@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 import json
 import os
-import requests
-import shutil
 
 import net_util
 
 
 def _request_authentication():
-  with open('/configuration.json') as configuration_file:
+  with open('/bin/configuration.json') as configuration_file:
       configuration = json.load(configuration_file)
   request_data = {
     'username': configuration['email'],

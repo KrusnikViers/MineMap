@@ -1,15 +1,17 @@
 #!/usr/bin/python3
-import requests
+import json
 import os
+import requests
+import shutil
 
 def get(url: str, cookies=None):
   request = requests.get(url, cookies=cookies)
-  print('GET request to {}:\n{}'.format(url, request.text))
+  print('GET request to {}: {}'.format(url, request.status_code))
   return json.loads(request.text)
 
 def post(url: str, data):
   request = requests.post(url, data)
-  print('POST request to {}:\n{}'.format(url, request.text))
+  print('POST request to {}: {}'.format(url, request.status_code))
   return json.loads(request.text)
 
 def download(url: str, location: str):

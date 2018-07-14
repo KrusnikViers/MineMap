@@ -5,6 +5,19 @@ import subprocess
 import net_util
 
 
+# Download local installation for latest released texture pack.
+def _update_client():
+  manifest = net_util.get(
+    'https://launchermeta.mojang.com/mc/game/version_manifest.json')
+  version_id = manifest['latest']['release']
+
+  version_path = '/versions/{0}/{0}.jar'.format(version_id)
+  net_util.download(
+    'https://s3.amazonaws.com/Minecraft.Download' + version_path,
+    '/bin/client.jar')
+
+
+# Request authentication information to access Minecraft API.
 def _request_authentication():
   with open('/bin/configuration.json') as configuration_file:
       configuration = json.load(configuration_file)
@@ -12,7 +25,7 @@ def _request_authentication():
     'username': configuration['email'],
     'password': configuration['password'],
     'agent': {'name': 'Minecraft', 'version': 1},
-    'clientToken': 'MineMap'
+    'clientToken': 'MineMapServer'
   }
   response = net_util.post('https://authserver.mojang.com/authenticate',
                            json.dumps(request_data))
@@ -24,6 +37,7 @@ def _request_authentication():
   }
 
 
+# Download latest world backup from Realms server.
 def _download_world_to_file(auth_data):
   cookies = {
     'sid': "token:{}:{}".format(auth_data['token'], auth_data['id']),
@@ -41,14 +55,27 @@ def _download_world_to_file(auth_data):
   net_util.download(download_link, '/rendering/world.tar.gz')
 
 
+# Unpack world data and process it with overviewer.
 def _publish_map():
-  return subprocess.run('gunzip -c /rendering/world.tar.gz > /rendering/wolrd.tar').returncode or
-         subprocess.run('mkdir -p /rendering/world').returncode or
-         subprocess.run('tar -xvf /rendering/world.tar -C /rendering/world').returncode or
-         subprocess.run('overviewer.py --config=/bin/config.py').returncode
+  def execute_sequence(commands):
+    for command in commands:
+      if subprocess.run(command, shell=True).returncode != 0:
+        break
+
+  execute_sequence([
+      'mkdir -p /rendering/world',
+      'mkdir -p /rendering/new_version',
+      'gunzip -c /rendering/world.tar.gz > /rendering/world.tar',
+      'tar -xvf /rendering/world.tar -C /rendering/',
+      'overviewer.py --config=/bin/config.py',
+      'rm -rf /public/*',
+      'mv /rendering/new_version/* /public/',
+      'rm -rf ./rendering/*'
+    ])
 
 
 def rebuild_map():
+  _update_client()
   auth_data = _request_authentication()
   _download_world_to_file(auth_data)
   _publish_map()

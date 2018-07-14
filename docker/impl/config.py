@@ -1,4 +1,5 @@
 worlds["default"] = "/rendering/world"
+texturepath = "/bin/client.jar"
 
 renders["day"] = {
     "world": "default",
@@ -25,4 +26,4 @@ renders["survivalnether"] = {
     "defaultzoom": "2"
 }
 
-outputdir = "/public/"
+outputdir = "/rendering/new_version"

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-python /impl/entry.py
+python /bin/entry.py
 
 nginx -t
-nginx
+# Disable nginx during development process
+# nginx

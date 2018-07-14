@@ -1,7 +1,7 @@
-worlds["myworld"] = "/rendering/world"
+worlds["default"] = "/rendering/world"
 
 renders["daytime"] = {
-    "world": "myworld",
+    "world": "default",
     "title": "Daytime",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",

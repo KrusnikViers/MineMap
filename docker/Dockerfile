@@ -23,7 +23,7 @@ COPY config.nginx /etc/nginx/sites-enabled
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Move main container infrastructure scripts.
-RUN mkdir -p /bin && mkdir -p /public &&  mkdir -p /rendering
+RUN mkdir -p /bin && mkdir -p /public && chmod a+r /public &&  mkdir -p /rendering
 COPY configuration.json /bin
 COPY impl /bin
 

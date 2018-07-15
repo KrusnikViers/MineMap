@@ -11,6 +11,7 @@ server {
     error_log /var/log/nginx/error.log crit;
 
     location / {
-        alias /public;
+        autoindex on;
+        alias /public/;
     }
 }

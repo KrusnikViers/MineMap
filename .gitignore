@@ -1,2 +1,6 @@
+# Project files
+venv/
+.idea/
+
 # Actual configuration with credentials should never be added to git.
 configuration.json

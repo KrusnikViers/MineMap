@@ -1,22 +1,29 @@
-worlds["Current"] = "/build/world"
+worlds["default"] = "/build/world"
 texturepath = "/build/client.jar"
 
 renders["day"] = {
-    "world": "Current",
+    "world": "default",
     "title": "Day",
     "rendermode": smooth_lighting,
     "dimension": "overworld",
     "northdirection": "upper-right",
 }
 renders["night"] = {
-    "world": "Current",
+    "world": "default",
     "title": "Night",
     "rendermode": smooth_night,
     "dimension": "overworld",
     "northdirection": "upper-right",
 }
-renders["survivalnether"] = {
-    "world": "Current",
+renders["biomes"] = {
+    "world": "default",
+    "title": "Biomes",
+    "rendermode": [ClearBase(), BiomeOverlay()],
+    "overlay": ["day"],
+    "northdirection": "upper-right",
+}
+renders["nether"] = {
+    "world": "default",
     "title": "Nether",
     "rendermode": nether_smooth_lighting,
     "dimension": "nether",

@@ -20,6 +20,9 @@ RUN apt-get install -y nginx                      &&\
 # Install base python dependencies.
 RUN pip3 install --no-cache-dir --upgrade -r /src/requirements.txt
 
+# Install cron to automate updates.
+RUN apt-get install -y cron
+
 # Clean up after installation.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

@@ -13,7 +13,7 @@ def http_get(url: str, cookies=None):
 
 
 def http_post(url: str, request_data):
-    return json.loads(requests.post(url, json.dumps(request_data)))
+    return json.loads(requests.post(url, json.dumps(request_data)).text)
 
 
 def download_to_file(url: str, location: str):
@@ -32,7 +32,7 @@ def get_latest_backup():
                      '/build/client.jar')
 
     # Request authentication to access API.
-    with open('/resources/configuration.json') as configuration_file:
+    with open('/src/configuration.json') as configuration_file:
         configuration = json.load(configuration_file)
     auth_request_body = {
         'username': configuration['email'],
@@ -75,19 +75,21 @@ def render_backup():
 def write_statistics(start_downloading_time, start_rendering_time, previous_data):
     # Shrink old records.
     max_old_records = 49
-    previous_data['renders'] = previous_data[:max_old_records]
+    previous_data['renders'] = previous_data['renders'][:max_old_records]
 
     # Insert new record in the beginning.
-    downloading = datetime.timedelta(seconds=(start_rendering_time - start_downloading_time))
-    rendering = datetime.timedelta(seconds=(time.time() - start_rendering_time))
-    timestamp = datetime.datetime.now()
+    downloading_time = datetime.timedelta(seconds=(start_rendering_time - start_downloading_time))
+    rendering_time = datetime.timedelta(seconds=(time.time() - start_rendering_time))
+    current_time = datetime.datetime.now()
     new_record = json.loads(
-        '{"downloading":"{}", "rendering":"{}", "at":"{}"}'.format(downloading, rendering, timestamp))
+        '{"downloading":"' + str(downloading_time) + '",'
+        '"rendering":"' + str(rendering_time) + '",'
+        '"at":"' + str(current_time) + '"}')
     previous_data['renders'] = [new_record] + previous_data['renders']
 
     # Dump data
-    with open("/public/last_version.txt", "w") as version_file:
-        json.dump(previous_data)
+    with open("/public/version_data.txt", "w") as version_file:
+        json.dump(previous_data, version_file)
 
 
 def update_render():

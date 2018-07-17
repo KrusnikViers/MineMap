@@ -7,13 +7,13 @@ RUN apt-get install -y wget gnupg &&\
     apt-get update &&\
     apt-get install -y minecraft-overviewer
 
-# Move nginx and python resources into container.
+# Move resources into container.
 COPY resources /minemap/resources
 
 # Install nginx. |daemon off| prevents nginx from daemonizing.
 RUN apt-get install -y nginx                                     &&\
     rm /etc/nginx/sites-enabled/default                          &&\
-    cp /minemap/resources/minemap.nginx /etc/nginx/sites-enabled &&\
+    cp /minemap/resources/server.nginx /etc/nginx/sites-enabled &&\
     echo 'daemon off;' >> /etc/nginx/nginx.conf
 
 # Install base python dependencies.

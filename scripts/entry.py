@@ -1,15 +1,12 @@
 #!/usr/bin/python3
 import crontab
 
-import refresh
+import rebuild
 
 # Automate next updates.
 cron = crontab.CronTab()
 if not cron.find_comment('minemap'):
-  # Update map for the first time.
-  refresh.rebuild_map()
-
-  job = cron.new(command='/usr/bin/python3 /minemap/scripts/refresh.py',
-                 comment='minemap')
+  rebuild.update_render()
+  job = cron.new(command='/usr/bin/python3 /scripts/rebuild.py', comment='minemap')
   job.hour.every(8)
   cron.write()

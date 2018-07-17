@@ -1,5 +1,5 @@
-worlds["Current"] = "/minemap/rendering/world"
-texturepath = "/minemap/rendering/client.jar"
+worlds["Current"] = "/build/world"
+texturepath = "/build/client.jar"
 
 renders["day"] = {
     "world": "Current",
@@ -23,4 +23,4 @@ renders["survivalnether"] = {
     "northdirection": "upper-right",
 }
 
-outputdir = "/minemap/rendering/public"
+outputdir = "/build/public"

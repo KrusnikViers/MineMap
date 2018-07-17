@@ -12,6 +12,6 @@ server {
 
     location / {
         autoindex on;
-        alias /minemap/public/;
+        alias /public/;
     }
 }

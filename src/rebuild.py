@@ -73,7 +73,7 @@ def render_backup():
     ])
 
 
-def finish_update(start_downloading_time, start_rendering_time, previous_version_data):
+def finish_update(start_downloading_time, start_rendering_time, previous_data):
     # Shrink old records.
     max_old_records = 49
     previous_data['renders'] = previous_data['renders'][:max_old_records]

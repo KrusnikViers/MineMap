@@ -1,34 +1,39 @@
-worlds["default"] = "/build/world"
+worlds["Realm"] = "/build/world"
 texturepath = "/build/client.jar"
 
-renders["day"] = {
-    "world": "default",
+
+def poi_filter(poi):
+    if poi['id'] == 'Sign' and poi['Text4'] == '-<!>-':
+        return "\n".join(map(escape, [poi['Text1'], poi['Text2'], poi['Text3']]))
+
+renders["Day"] = {
+    "world": "Realm",
     "title": "Day",
     "rendermode": smooth_lighting,
     "dimension": "overworld",
     "northdirection": "upper-right",
+    "markers": [dict(name="Manual", filterFunction=poi_filter)],
 }
-renders["night"] = {
-    "world": "default",
-    "title": "Night",
-    "rendermode": smooth_night,
-    "dimension": "overworld",
-    "northdirection": "upper-right",
-}
-renders["biomes"] = {
-    "world": "default",
-    "title": "Biomes",
-    "rendermode": [BiomeOverlay()],
-    "dimension": "overworld",
-    "overlay": ["day"],
-    "northdirection": "upper-right",
-}
-renders["nether"] = {
-    "world": "default",
-    "title": "Nether",
-    "rendermode": nether_smooth_lighting,
-    "dimension": "nether",
-    "northdirection": "upper-right",
-}
+# renders["Night"] = {
+#     "world": "Realm",
+#     "title": "Night",
+#     "rendermode": smooth_night,
+#     "dimension": "overworld",
+#     "northdirection": "upper-right",
+# }
+# renders["Biomes"] = {
+#     "world": "Realm",
+#     "title": "Biomes",
+#     "rendermode": [BiomeOverlay()],
+#     "overlay": ["Day"],
+#     "northdirection": "upper-right",
+# }
+# renders["Nether"] = {
+#     "world": "Realm",
+#     "title": "Nether",
+#     "rendermode": nether_smooth_lighting,
+#     "dimension": "nether",
+#     "northdirection": "upper-right",
+# }
 
 outputdir = "/build/public"

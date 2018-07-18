@@ -1,9 +1,5 @@
 FROM python:3.5
 
-# Move sources into container.
-COPY src /src
-COPY configuration.json /src
-
 # Install Overviewer.
 RUN apt-get install -y wget gnupg                                              &&\
     echo "deb http://overviewer.org/debian ./" >> /etc/apt/sources.list        &&\
@@ -26,5 +22,11 @@ RUN apt-get install -y cron
 # Clean up after installation.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Move sources into container.
+RUN mkdir -p /public /build
+COPY configuration.json /src
+COPY src /src
+
 # Move, set and validate main scripts
 CMD ["/src/entry.sh"]
+

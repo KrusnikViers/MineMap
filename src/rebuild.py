@@ -11,13 +11,12 @@ import traceback
 
 
 def load_version_data():
-    previous_version_data = json.loads('{}')
+    previous_version_data = json.loads('{"updates":[]}')
     if os.path.exists('/public/version_data.txt'):
         with open('/public/version_data.txt') as version_file:
             previous_version_data = json.load(version_file)
-    if 'renders' in previous_version_data:
-        max_old_records = 99
-        previous_version_data['updates'] = previous_version_data['updates'][:max_old_records]
+    max_old_records = 99
+    previous_version_data['updates'] = previous_version_data['updates'][:max_old_records]
     return previous_version_data
 
 

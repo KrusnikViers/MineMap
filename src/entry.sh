@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python /src/entry.py
+python /src/rebuild.py
 
 nginx -t
 nginx

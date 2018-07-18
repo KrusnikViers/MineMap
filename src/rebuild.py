@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import crontab
 import datetime
 import json
 import os
@@ -72,7 +73,7 @@ def render_backup():
     ])
 
 
-def write_statistics(start_downloading_time, start_rendering_time, previous_data):
+def finish_update(start_downloading_time, start_rendering_time, previous_version_data):
     # Shrink old records.
     max_old_records = 49
     previous_data['renders'] = previous_data['renders'][:max_old_records]
@@ -87,16 +88,26 @@ def write_statistics(start_downloading_time, start_rendering_time, previous_data
         '"at":"' + str(current_time) + '"}')
     previous_data['renders'] = [new_record] + previous_data['renders']
 
+    # Check, that next updates are automated.
+    cron = crontab.CronTab(user=True)
+    if not len(list(cron.find_comment('minemap'))):
+        # Rounded hours, spent on previous rendering + 1
+        hours_count = ((time.time() - start_downloading_time) + 1800) // 3600 + 1
+        job = cron.new(command='python /src/rebuild.py', comment='minemap')
+        job.hour.every(hours_count)
+        previous_data['update_period_hours'] = str(hours_count)
+        cron.write()
+
     # Dump data
     with open("/public/version_data.txt", "w") as version_file:
         json.dump(previous_data, version_file)
 
 
 def update_render():
-    previous_data = json.loads('{"renders":[]}')
+    previous_version_data = json.loads('{"renders":[]}')
     if os.path.exists('/public/version_data.txt'):
         with open('/public/version_data.txt') as version_file:
-            previous_data = json.load(version_file)
+            previous_version_data = json.load(version_file)
 
     start_downloading_time = time.time()
     get_latest_backup()
@@ -104,8 +115,7 @@ def update_render():
     start_rendering_time = time.time()
     render_backup()
 
-    write_statistics(start_downloading_time, start_rendering_time, previous_data)
+    finish_update(start_downloading_time, start_rendering_time, previous_version_data)
 
 
-if __name__ == "__main__":
-    update_render()
+update_render()

@@ -18,7 +18,8 @@ renders["night"] = {
 renders["biomes"] = {
     "world": "default",
     "title": "Biomes",
-    "rendermode": [ClearBase(), BiomeOverlay()],
+    "rendermode": [BiomeOverlay()],
+    "dimension": "overworld",
     "overlay": ["day"],
     "northdirection": "upper-right",
 }

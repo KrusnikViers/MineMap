@@ -10,6 +10,13 @@ import time
 import sys
 
 
+# Prevent multiple launches of the same script
+if os.path.exists('/build/lock.file'):
+    sys.exit(1)
+with open('/build/lock.file', 'w') as lock_file:
+    lock_file.write('Locked!')
+
+
 # Load previous updates history
 previous_updates = None
 if os.path.exists('/public/version_data.txt'):
@@ -22,6 +29,7 @@ start_time = time.time()
 
 
 def finish(error_string = None):
+    subprocess.run('rm -rf /build/*', shell=True)
     time_estimation_hours = 2
     time_spent = time.time() - start_time
     if not error_string:
@@ -30,7 +38,7 @@ def finish(error_string = None):
     # Update cron job, if necessary
     cron = crontab.CronTab(user=True)
     existing_jobs = list(cron.find_comment('minemap'))
-    job = existing_jobs[0] if len(existing_jobs) else cron.new(command='python /src/rebuild.py', comment='minemap')
+    job = existing_jobs[0] if len(existing_jobs) else cron.new(command='python /src/rebuild.py &> /last_log.txt', comment='minemap')
     job.hour.every(time_estimation_hours)
     cron.write()
 
@@ -75,11 +83,16 @@ def execute_sequence(commands):
 # Load client of the latest release version
 request = requests.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')
 client_versions = try_json_loads(request.text)
-if not client_versions or 'latest' not in client_versions or 'release' not in client_versions['latest']:
+if not client_versions or 'versions' not in client_versions:
     finish('Bad client versions response: ' + request.text)
-client_version = client_versions['latest']['release']
-download_to_file('https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{0}.jar'.format(client_version),
-                 '/build/client.jar')
+version_manifest_url = client_versions['versions'][0]['url']
+client_version = client_versions['versions'][0]['id']
+
+request = requests.get(version_manifest_url)
+client_downloads = try_json_loads(request.text)
+if not client_downloads or 'downloads' not in client_downloads:
+    finish('Bad client downloads response: ' + request.text)
+download_to_file(client_downloads['downloads']['client']['url'], '/build/client.jar')
 
 # Request authentication to access API.
 with open('/configuration.json') as configuration_file:
@@ -123,7 +136,6 @@ execute_sequence([
     'overviewer.py --config=/src/config.py --genpoi --skip-players'
     'rm -rf /public/*',
     'mv /build/out/* /public/',
-    'rm -rf /build/*'
 ])
 
 finish()

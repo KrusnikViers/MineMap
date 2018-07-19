@@ -1,2 +1,0 @@
-python-crontab==2.3
-requests==2.19

@@ -1,4 +1,4 @@
-worlds["Realm"] = "/build/world"
+worlds["default"] = "/build/world"
 texturepath = "/build/client.jar"
 
 
@@ -6,8 +6,8 @@ def poi_filter(poi):
     if poi['id'] == 'Sign' and poi['Text4'] == '-<!>-':
         return "\n".join(map(escape, [poi['Text1'], poi['Text2'], poi['Text3']]))
 
-renders["Day"] = {
-    "world": "Realm",
+renders["day"] = {
+    "world": "default",
     "title": "Day",
     "rendermode": smooth_lighting,
     "dimension": "overworld",
@@ -36,4 +36,4 @@ renders["Day"] = {
 #     "northdirection": "upper-right",
 # }
 
-outputdir = "/build/public"
+outputdir = "/build/out"

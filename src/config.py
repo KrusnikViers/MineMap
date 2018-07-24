@@ -14,26 +14,6 @@ renders["day"] = {
     "northdirection": "upper-right",
     "markers": [dict(name="Manual", filterFunction=poi_filter)],
 }
-# renders["Night"] = {
-#     "world": "Realm",
-#     "title": "Night",
-#     "rendermode": smooth_night,
-#     "dimension": "overworld",
-#     "northdirection": "upper-right",
-# }
-# renders["Biomes"] = {
-#     "world": "Realm",
-#     "title": "Biomes",
-#     "rendermode": [BiomeOverlay()],
-#     "overlay": ["Day"],
-#     "northdirection": "upper-right",
-# }
-# renders["Nether"] = {
-#     "world": "Realm",
-#     "title": "Nether",
-#     "rendermode": nether_smooth_lighting,
-#     "dimension": "nether",
-#     "northdirection": "upper-right",
-# }
+# TODO(Viers): Add more renders.
 
 outputdir = "/build/out"

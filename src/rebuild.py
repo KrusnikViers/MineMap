@@ -14,7 +14,7 @@ import sys
 if os.path.exists('/build/lock.file'):
     sys.exit(1)
 with open('/build/lock.file', 'w') as lock_file:
-    lock_file.write('Locked!')
+    lock_file.write('lock')
 
 
 # Load previous updates history
@@ -30,15 +30,18 @@ start_time = time.time()
 
 def finish(error_string = None):
     subprocess.run('rm -rf /build/*', shell=True)
+    
+    # Estimated time between builds is rounded time of previous build + 2 more hours.
     time_estimation_hours = 2
-    time_spent = time.time() - start_time
+    time_spent_seconds = time.time() - start_time
     if not error_string:
-        time_estimation_hours += (time_spent + 1800) // 3600
+        time_estimation_hours += (time_spent_seconds + 1800) // 3600
 
     # Update cron job, if necessary
     cron = crontab.CronTab(user=True)
     existing_jobs = list(cron.find_comment('minemap'))
-    job = existing_jobs[0] if len(existing_jobs) else cron.new(command='python /src/rebuild.py &> /last_log.txt', comment='minemap')
+    job = existing_jobs[0] if existing_jobs else cron.new(command='python /src/rebuild.py &> /last_log.txt',
+                                                          comment='minemap')
     job.hour.every(time_estimation_hours)
     cron.write()
 
@@ -47,10 +50,11 @@ def finish(error_string = None):
     if error_string:
         current_record['error'] = error_string
     else:
-        current_record['build_time'] = str(datetime.timedelta(time_spent))
+        current_record['build_time'] = str(datetime.timedelta(seconds=time_spent_seconds))
     history_to_write = [current_record]
     if previous_updates:
-        history_to_write += previous_updates[:99]
+        history_records_to_store = 99
+        history_to_write += previous_updates[:history_records_to_store]
     with open("/public/version_data.txt", "w") as output_file:
         json.dump(history_to_write, output_file, indent='  ')
     sys.exit(1 if error_string else 0)
@@ -133,7 +137,7 @@ execute_sequence([
     'gunzip -c /build/world.tar.gz > /build/world.tar',
     'tar -xvf /build/world.tar -C /build/',
     'overviewer.py --config=/src/config.py',
-    'overviewer.py --config=/src/config.py --genpoi --skip-players'
+    'overviewer.py --config=/src/config.py --genpoi --skip-players',
     'rm -rf /public/*',
     'mv /build/out/* /public/',
 ])

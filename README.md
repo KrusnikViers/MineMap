@@ -1,11 +1,11 @@
 # MineMap
-Map builder for official minecraft realms.
+Online map for official minecraft realms.
 
 ### Running
-Fill the configuration file (same as configuration.json.example). This file should be mounted during the `run`
+Fill the configuration file (same as configuration.json.example). This file should be mounted during the `run` command.
 
-Container could be started with this command:
-`docker run -d -v [path/to/configuration.json]:/configuration.json --name minemap-instance --restart always -p 80:80 minemap-image`
+Default run command: `docker run -d -v [path/to/configuration.json]:/configuration.json --name minemap-instance --restart always -p 80:80 viers/minemap`,
+where:
 
 * `-d` - Detach after launch. To see logs, use `docker logs --follow minemap-instance`.
 * `-v` - Pass file into container. Replace `[path/to/configuration.json]` with absolute path to filled configuration file.
@@ -14,7 +14,7 @@ Container could be started with this command:
 * `-p` - Port mapping.
 
 ### Building
-`docker build --no-cache --force-rm -t minemap-image .`
+Default build command: `docker build --no-cache --force-rm -t minemap-image .`
 
 ### How it works
 This image includes nginx server and minecraft-overviewer installation.
@@ -26,4 +26,4 @@ Map building process:
 4. Download latest backup for this server.
 5. Unpack backup and run overviewer on it.
 
-Map building is repeating over time, period is previous build time + 2 hours. Additional logs are in `version_data.txt` file, which is also available on server via direct link.
+Map is rebuilding over time, where period is a previous build time + 2 hours. Additional logs are in the `version_data.txt` file, which is also available on a server via direct link. Repeating is implemented as a cron tasks, while nginx is the main image process.

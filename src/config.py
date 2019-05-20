@@ -16,4 +16,4 @@ renders["day"] = {
 }
 # TODO(Viers): Add more renders.
 
-outputdir = "/build/out"
+outputdir = "/public"

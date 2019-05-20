@@ -1,6 +1,10 @@
 # MineMap
 Online map for official minecraft realms.
 
+[![Docker Build Status](https://img.shields.io/docker/build/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
+[![MicroBadger Size](https://images.microbadger.com/badges/image/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
+
 ### Running
 Fill the configuration file (same as configuration.json.example). This file should be mounted during the `run` command.
 

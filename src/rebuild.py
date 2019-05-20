@@ -28,7 +28,7 @@ rebuild_timestamp = datetime.datetime.now()
 start_time = time.time()
 
 
-def finish(error_string = None):
+def finish(error_string=None):
     subprocess.run('rm -rf /build/*', shell=True)
     
     # Estimated time between builds is rounded time of previous build + 2 more hours.
@@ -40,7 +40,7 @@ def finish(error_string = None):
     # Update cron job, if necessary
     cron = crontab.CronTab(user=True)
     existing_jobs = list(cron.find_comment('minemap'))
-    job = existing_jobs[0] if existing_jobs else cron.new(command='python /src/rebuild.py &> /last_log.txt',
+    job = existing_jobs[0] if existing_jobs else cron.new(command='python /src/rebuild.py &> /public/last_log.txt',
                                                           comment='minemap')
     job.hour.every(time_estimation_hours)
     cron.write()
@@ -137,9 +137,7 @@ execute_sequence([
     'gunzip -c /build/world.tar.gz > /build/world.tar',
     'tar -xvf /build/world.tar -C /build/',
     'overviewer.py --config=/src/config.py',
-    'overviewer.py --config=/src/config.py --genpoi --skip-players',
-    'rm -rf /public/*',
-    'mv /build/out/* /public/',
+    'overviewer.py --config=/src/config.py --genpoi --skip-players'
 ])
 
 finish()

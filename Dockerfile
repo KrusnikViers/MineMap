@@ -5,14 +5,12 @@ RUN pip3 install --no-cache-dir --upgrade \
          python-crontab==2.3              \
          requests==2.19
          
-# Install nginx. |daemon off| prevents nginx from daemonizing.
+# Install cron to automate updates and nginx. |daemon off| prevents nginx from daemonizing.
 EXPOSE 80
-RUN apt-get install -y nginx                    &&\
+RUN apt-get update                              &&\
+    apt-get install -y nginx cron               &&\
     rm /etc/nginx/sites-enabled/default         &&\
     echo 'daemon off;' >> /etc/nginx/nginx.conf
-
-# Install cron to automate updates.
-RUN apt-get install -y cron
 
 # Install Overviewer.
 RUN apt-get install -y wget gnupg                                              &&\

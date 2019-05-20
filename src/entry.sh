@@ -2,7 +2,7 @@
 
 if [ -s "/configuration.json" ]
 then
-    python /src/rebuild.py
+    python -u /src/rebuild.py
     service cron start
     nginx -t
     nginx

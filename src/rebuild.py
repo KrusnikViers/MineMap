@@ -120,12 +120,19 @@ with open('/configuration.json') as configuration_file:
 # Request latest server id.
 request = requests.get('https://pc.realms.minecraft.net/worlds', cookies=cookies)
 worlds_list = try_json_loads(request.text)
+world_id = None
+
 if not worlds_list or 'servers' not in worlds_list or len(worlds_list['servers']) == 0:
     finish('Bad worlds list response: ' + request.text)
-first_world_id = worlds_list['servers'][0]['id']
+
+for server in worlds_list['servers']:
+    if server['name'] == configuration['name']:
+        world_id = server['id']
+if world_id is None:
+    finish('World with id {0} was not found in {1}'.format(configuration['name'], worlds_list['servers']))
 
 # Try to download latest backup.
-request = requests.get('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(first_world_id),
+request = requests.get('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(world_id),
                        cookies=cookies)
 backup_information = try_json_loads(request.text)
 if not backup_information or 'downloadLink' not in backup_information:

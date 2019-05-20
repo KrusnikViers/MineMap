@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3-slim
 
 # Install python dependencies.
 RUN pip3 install --no-cache-dir --upgrade \
@@ -9,7 +9,8 @@ RUN pip3 install --no-cache-dir --upgrade \
 # Install nginx. |daemon off| prevents nginx from daemonizing.
 # Install minecraft-overviewer
 EXPOSE 80
-RUN apt-get install -y wget gnupg                                              &&\
+RUN apt-get update                                                             &&\
+    apt-get install -y wget gnupg                                              &&\
     echo "deb http://overviewer.org/debian ./" >> /etc/apt/sources.list        &&\
     wget -O - https://overviewer.org/debian/overviewer.gpg.asc | apt-key add - &&\
     apt-get update                                                             &&\

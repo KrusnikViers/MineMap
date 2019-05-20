@@ -40,7 +40,7 @@ def finish(error_string=None):
     # Update cron job, if necessary
     cron = crontab.CronTab(user=True)
     existing_jobs = list(cron.find_comment('minemap'))
-    job = existing_jobs[0] if existing_jobs else cron.new(command='python /src/rebuild.py &> /public/last_log.txt',
+    job = existing_jobs[0] if existing_jobs else cron.new(command='python -u /src/rebuild.py &> /public/last_log.txt',
                                                           comment='minemap')
     job.hour.every(time_estimation_hours)
     cron.write()

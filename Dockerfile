@@ -4,14 +4,7 @@ FROM python:3.5
 RUN pip3 install --no-cache-dir --upgrade \
          python-crontab==2.3              \
          requests==2.19
-
-# Install Overviewer.
-RUN apt-get install -y wget gnupg                                              &&\
-    echo "deb http://overviewer.org/debian ./" >> /etc/apt/sources.list        &&\
-    wget -O - https://overviewer.org/debian/overviewer.gpg.asc | apt-key add - &&\
-    apt-get update                                                             &&\
-    apt-get install -y minecraft-overviewer
-
+         
 # Install nginx. |daemon off| prevents nginx from daemonizing.
 EXPOSE 80
 RUN apt-get install -y nginx                    &&\
@@ -20,6 +13,13 @@ RUN apt-get install -y nginx                    &&\
 
 # Install cron to automate updates.
 RUN apt-get install -y cron
+
+# Install Overviewer.
+RUN apt-get install -y wget gnupg                                              &&\
+    echo "deb http://overviewer.org/debian ./" >> /etc/apt/sources.list        &&\
+    wget -O - https://overviewer.org/debian/overviewer.gpg.asc | apt-key add - &&\
+    apt-get update                                                             &&\
+    apt-get install -y minecraft-overviewer=0.13.89
 
 # Clean up after installation.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

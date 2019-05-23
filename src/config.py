@@ -14,6 +14,7 @@ renders["day"] = {
     "northdirection": "upper-right",
     "markers": [dict(name="Manual", filterFunction=poi_filter)],
 }
+
 # TODO(Viers): Add more renders.
 
 outputdir = "/public"

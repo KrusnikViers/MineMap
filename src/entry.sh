@@ -2,10 +2,8 @@
 
 if [ -s "/configuration.json" ]
 then
-    python -u /src/rebuild.py
-    service cron start
-    nginx -t
-    nginx
+    cd /src
+    python ./main.py
 else
    echo "Configuration file is empty!"
 fi

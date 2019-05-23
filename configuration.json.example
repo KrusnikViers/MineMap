@@ -1,5 +1,6 @@
 {
   "email": "email@at.com",
   "password": "password",
-  "name": "realm name"
+  "realm_name": "realm name",
+  "update_period": 12
 }

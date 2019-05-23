@@ -1,150 +1,118 @@
 #!/usr/bin/python3
-import crontab
-import datetime
 import json
 import os
-import requests
 import shutil
 import subprocess
-import time
-import sys
+
+import requests
 
 
-# Prevent multiple launches of the same script
-if os.path.exists('/build/lock.file'):
-    sys.exit(1)
-with open('/build/lock.file', 'w') as lock_file:
-    lock_file.write('lock')
+class ExecutionResult:
+    def __init__(self, data=None, error_string=''):
+        self.data = data
+        self.error_string = error_string
+
+    def is_ok(self) -> bool:
+        return not self.error_string
+
+    def __str__(self) -> str:
+        return ('ERROR: {}'.format(self.error_string) if self.error_string else 'No error') + \
+               (', DATA: {}'.format(self.data) if self.data else ', no data')
 
 
-# Load previous updates history
-previous_updates = None
-if os.path.exists('/public/version_data.txt'):
-    with open('/public/version_data.txt') as version_file:
-        previous_updates = json.load(version_file)['history']
-
-# Start time measurement.
-rebuild_timestamp = datetime.datetime.now()
-start_time = time.time()
-
-
-def finish(error_string=None):
-    subprocess.run('rm -rf /build/*', shell=True)
-    
-    # Estimated time between builds is rounded time of previous build + 2 more hours.
-    time_estimation_hours = 2
-    time_spent_seconds = time.time() - start_time
-    if not error_string:
-        time_estimation_hours += (time_spent_seconds + 1800) // 3600
-
-    # Update cron job, if necessary
-    cron = crontab.CronTab(user=True)
-    existing_jobs = list(cron.find_comment('minemap'))
-    job = existing_jobs[0] if existing_jobs else cron.new(command='python -u /src/rebuild.py &> /public/last_log.txt',
-                                                          comment='minemap')
-    job.hour.every(time_estimation_hours)
-    cron.write()
-
-    # Fill version_data.txt
-    current_record = {'timestamp': str(rebuild_timestamp), 'estimation': str(time_estimation_hours)}
-    if error_string:
-        current_record['error'] = error_string
-    else:
-        current_record['build_time'] = str(datetime.timedelta(seconds=time_spent_seconds))
-    history_to_write = [current_record]
-    if previous_updates:
-        history_records_to_store = 99
-        history_to_write += previous_updates[:history_records_to_store]
-    with open("/public/version_data.txt", "w") as output_file:
-        json.dump(history_to_write, output_file, indent='  ')
-    sys.exit(1 if error_string else 0)
-
-
-def download_to_file(url: str, location: str):
+def _download_to_file(url: str, location: str) -> ExecutionResult:
     os.makedirs(os.path.dirname(location), exist_ok=True)
     download_request = requests.get(url, stream=True)
     if download_request.status_code == 200:
         with open(location, 'wb') as output_file:
             download_request.raw.decode_content = True
             shutil.copyfileobj(download_request.raw, output_file)
+            return ExecutionResult()
+    return ExecutionResult(error_string='Download to {} failed from {}'.format(location, url))
+
+
+def _request_json(url: str, is_get_request=True, body=None, cookies=None) -> ExecutionResult:
+    if is_get_request:
+        current_request = requests.get(url, cookies=cookies)
     else:
-        finish('Downloading failed from ' + url)
+        current_request = requests.post(url, body, cookies=cookies)
 
-
-def try_json_loads(string: str):
     try:
-        return json.loads(string)
+        return ExecutionResult(data=json.loads(current_request.text))
     except json.decoder.JSONDecodeError:
-        return ''
+        return ExecutionResult(error_string='Bad response: {}'.format(current_request.text))
 
 
-def execute_sequence(commands):
+def _execute_sequence(commands) -> ExecutionResult:
     for command in commands:
         if subprocess.run(command, shell=True).returncode != 0:
-            finish('Command failed: ' + command)
+            return ExecutionResult(error_string='Command failed: {}'.format(command))
+    return ExecutionResult()
 
 
-# Load client of the latest release version
-request = requests.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')
-client_versions = try_json_loads(request.text)
-if not client_versions or 'versions' not in client_versions:
-    finish('Bad client versions response: ' + request.text)
-version_manifest_url = client_versions['versions'][0]['url']
-client_version = client_versions['versions'][0]['id']
+def rebuild(email, password, realm_name) -> ExecutionResult:
+    # Client version and manifest
+    get_version_result = _request_json('https://launchermeta.mojang.com/mc/game/version_manifest.json')
+    if not get_version_result.is_ok() or 'versions' not in get_version_result.data:
+        return ExecutionResult(error_string='Bad client versions list: {}'.format(get_version_result))
+    latest_version = get_version_result.data['versions'][0]
+    manifest_url = latest_version['url']
+    version_id = latest_version['id']
 
-request = requests.get(version_manifest_url)
-client_downloads = try_json_loads(request.text)
-if not client_downloads or 'downloads' not in client_downloads:
-    finish('Bad client downloads response: ' + request.text)
-download_to_file(client_downloads['downloads']['client']['url'], '/build/client.jar')
+    # Client storage server
+    manifest_result = _request_json(manifest_url)
+    if not manifest_result.is_ok() or 'downloads' not in manifest_result.data:
+        return ExecutionResult(error_string='Bad client manifest: {}'.format(manifest_result))
 
-# Request authentication to access API.
-with open('/configuration.json') as configuration_file:
-    configuration = json.load(configuration_file)
+    # Get the client itself
+    client_download_result = _download_to_file(manifest_result.data['downloads']['client']['url'], '/build/client.jar')
+    if not client_download_result.is_ok():
+        return client_download_result
+
+    # Request authentication to the Realms API
     request_body = {
-        'username': configuration['email'],
-        'password': configuration['password'],
+        'username': email,
+        'password': password,
         'agent': {'name': 'Minecraft', 'version': 1},
-        'clientToken': 'MineMapServer',
+        'clientToken': 'MinemapServer'
     }
-    request = requests.post('https://authserver.mojang.com/authenticate', json.dumps(request_body))
-    auth_data = try_json_loads(request.text)
-    if not auth_data or 'accessToken' not in auth_data or 'selectedProfile' not in auth_data:
-        finish('Bad auth response: ' + request.text)
+    auth_result = _request_json('https://authserver.mojang.com/authenticate',
+                                is_get_request=False, body=json.dumps(request_body))
+    if not auth_result.is_ok() or 'accessToken' not in auth_result.data or 'selectedProfile' not in auth_result.data:
+        return ExecutionResult(error_string='Bad auth response: {}'.format(auth_result))
+
+    # Request necessary server id
     cookies = {
-        'sid': 'token:{}:{}'.format(auth_data['accessToken'], auth_data['selectedProfile']['id']),
-        'user': auth_data['selectedProfile']['name'],
-        'version': client_version,
+        'sid': 'token:{}:{}'.format(auth_result.data['accessToken'], auth_result.data['selectedProfile']['id']),
+        'user': auth_result.data['selectedProfile']['name'],
+        'version': version_id,
     }
+    realms_result = _request_json('https://pc.realms.minecraft.net/worlds', cookies=cookies)
+    world_id = None
+    if not realms_result.is_ok() or 'servers' not in realms_result.data or len(realms_result.data['servers']) == 0:
+        return ExecutionResult(error_string='Bad realms list response: {}'.format(realms_result))
 
-# Request latest server id.
-request = requests.get('https://pc.realms.minecraft.net/worlds', cookies=cookies)
-worlds_list = try_json_loads(request.text)
-world_id = None
+    # Look for the world id among the realms
+    for server in realms_result.data['servers']:
+        if server['name'] == realm_name:
+            world_id = server['id']
+            break
+    if not world_id:
+        return ExecutionResult(error_string='Realm {} not found in {}'.format(realm_name, realms_result.data))
 
-if not worlds_list or 'servers' not in worlds_list or len(worlds_list['servers']) == 0:
-    finish('Bad worlds list response: ' + request.text)
+    # Download the latest backup
+    backup_metadata_result = _request_json('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(world_id),
+                                           cookies=cookies)
+    if not backup_metadata_result.is_ok() or 'downloadLink' not in backup_metadata_result.data:
+        return ExecutionResult(error_string='Bad backup metadata: {}'.format(backup_metadata_result))
 
-for server in worlds_list['servers']:
-    if server['name'] == configuration['name']:
-        world_id = server['id']
-if world_id is None:
-    finish('World with id {0} was not found in {1}'.format(configuration['name'], worlds_list['servers']))
+    download_backup_result = _download_to_file(backup_metadata_result.data['downloadLink'], '/build/world.tar.gz')
+    if not download_backup_result.is_ok():
+        return download_backup_result
 
-# Try to download latest backup.
-request = requests.get('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(world_id),
-                       cookies=cookies)
-backup_information = try_json_loads(request.text)
-if not backup_information or 'downloadLink' not in backup_information:
-    finish('Bad request for backup: ' + request.text)
-download_link = backup_information['downloadLink']
-download_to_file(download_link, '/build/world.tar.gz')
-
-execute_sequence([
-    'gunzip -c /build/world.tar.gz > /build/world.tar',
-    'tar -xvf /build/world.tar -C /build/',
-    'overviewer.py --config=/src/config.py',
-    'overviewer.py --config=/src/config.py --genpoi --skip-players'
-])
-
-finish()
+    return _execute_sequence([
+        'gunzip -c /build/world.tar.gz > /build/world.tar',
+        'tar -xvf /build/world.tar -C /build/',
+        'overviewer.py --config=/src/config.py >> /public/log.txt',
+        'overviewer.py --config=/src/config.py --genpoi --skip-players >> /public/log.txt'
+    ])

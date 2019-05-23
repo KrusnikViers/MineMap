@@ -1,5 +1,5 @@
 # MineMap
-Online map for official minecraft realms.
+Online self-updating map for official minecraft realms.
 
 [![Docker Build Status](https://img.shields.io/docker/build/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
@@ -7,12 +7,20 @@ Online map for official minecraft realms.
 
 ### Running
 Fill the configuration file (same as configuration.json.example). This file should be mounted during the `run` command.
+The map data is building in the `/public` directory inside a docker image, so it is recommended to mount this directory
+from the host OS as well, to use map data outside the image and recreate image without losing the rendered map.
 
-Default run command: `docker run -d -v [path/to/configuration.json]:/configuration.json --name minemap-instance --restart always -p 80:80 viers/minemap`,
+Configuration file parameters:
+* `email`: Email for Mojang account of realm holder.
+* `password`: Password from Mojang account of realm holder.
+* `name`: Realm name.
+* `update_period`: Minimum update period, in hours.
+
+Default docker run command: `docker run -d -v [path/to/host/public]:/public -v [path/to/configuration.json]:/configuration.json --name minemap-instance --restart always -p 80:80 viers/minemap`,
 where:
 
 * `-d` - Detach after launch. To see logs, use `docker logs --follow minemap-instance`.
-* `-v` - Pass file into container. Replace `[path/to/configuration.json]` with absolute path to filled configuration file.
+* `-v` - Mount file or directory into the container.
 * `--name` - Container name.
 * `--restart` - Restarting policy. 
 * `-p` - Port mapping.
@@ -29,5 +37,3 @@ Map building process:
 3. Access the first server in user realms list.
 4. Download latest backup for this server.
 5. Unpack backup and run overviewer on it.
-
-Map is rebuilding over time, where period is a previous build time + 2 hours. Additional logs are in the `version_data.txt` file, which is also available on a server via direct link. Repeating is implemented as a cron tasks, while nginx is the main image process.

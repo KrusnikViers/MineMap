@@ -3,7 +3,7 @@
 if [ -s "/configuration.json" ]
 then
     cd /src
-    python ./main.py
+    python -u ./main.py
 else
    echo "Configuration file is empty!"
 fi

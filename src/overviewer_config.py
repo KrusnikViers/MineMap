@@ -7,7 +7,7 @@ texturepath = "/build/client.jar"
 
 def poi_filter(poi):
     if (poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign') and '-<!>-' in poi['Text4']:
-        return "\n".join(map(escape, [poi['Text1'], poi['Text2'], poi['Text3']]))
+        return "\n".join([poi['Text1'], poi['Text2'], poi['Text3']])
 
 renders["day"] = {
     "world": "default",
@@ -21,7 +21,7 @@ renders["day"] = {
 renders["nether"] = {
     "world": "default",
     "title": "Nether",
-    "rendermode": "nether_smooth_lighting",
+    "rendermode": [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.4)],
     "dimension": "nether",
     "northdirection": "upper-right",
     "markers": [dict(name="Manual", filterFunction=poi_filter)],

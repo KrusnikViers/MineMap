@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import subprocess
+import time
 
 import requests
 
@@ -104,8 +105,23 @@ class OverviewerMapBuilder:
         raise RebuildException('Realm \'{}\' was not found: {}'.format(self.realm_name, realms_list['servers']))
 
     def _get_world_download_link(self, world_id: str):
-        backup_metadata = _get_json('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(world_id),
-                                    cookies=self.authorised_cookies)
+        retries_counter = 0
+        retries_max = 3
+        backup_metadata = None
+        while retries_counter < retries_max:
+            try:
+                backup_metadata = _get_json('https://pc.realms.minecraft.net/worlds/{}/slot/1/download'.format(world_id),
+                                            cookies=self.authorised_cookies)
+            except RebuildException as exc:
+                if 'Retry again later' in str(exc):
+                    print('Should retry again later, waiting 15s...')
+                    time.sleep(15)
+                    retries_counter += 1
+                    continue
+                raise exc
+
+        if backup_metadata is None and retries_counter == retries_max:
+            raise RebuildException('Could not retrieve backup metadata in {} attempts'.format(retries_max))
         if 'downloadLink' not in backup_metadata:
             raise RebuildException('Bad backup metadata: {}'.format(backup_metadata))
         return backup_metadata['downloadLink']

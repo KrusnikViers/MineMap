@@ -1,13 +1,36 @@
 from observer import JSObserver
-
+import re
 
 worlds["default"] = "/build/world"
 texturepath = "/build/client.jar"
 
 
 def poi_filter(poi):
-    if (poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign') and '-<!>-' in poi['Text4']:
-        return "\n".join([poi['Text1'], poi['Text2'], poi['Text3']])
+    allowed_icons = [
+        'anvil',
+        'anvil_red',
+        'factory',
+        'factory_red',
+        'hoe',
+        'hoe_red',
+        'mine',
+        'mine_red',
+        'ship',
+        'ship_red',
+        'tower',
+        'tower_red',
+        'town',
+        'town_red',
+    ]
+    if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
+        try:
+            marker_icon = re.search('-<(.+?)>-', poi['Text4']).group(1)
+            if marker_icon in allowed_icons:
+                poi['icon'] = 'icons/marker_{}.png'.format(marker_icon)
+                return " ".join([poi['Text1'], poi['Text2'], poi['Text3']])
+        except AttributeError:
+            pass
+
 
 renders["day"] = {
     "world": "default",

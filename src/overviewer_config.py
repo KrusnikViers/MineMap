@@ -1,5 +1,4 @@
 from observer import JSObserver
-import re
 
 worlds["default"] = "/build/world"
 texturepath = "/build/client.jar"
@@ -22,14 +21,12 @@ def poi_filter(poi):
         'town',
         'town_red',
     ]
-    if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
-        try:
-            marker_icon = re.search('-<(.+?)>-', poi['Text4']).group(1)
-            if marker_icon in allowed_icons:
-                poi['icon'] = 'icons/marker_{}.png'.format(marker_icon)
-                return " ".join([poi['Text1'], poi['Text2'], poi['Text3']])
-        except AttributeError:
-            pass
+    if (poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign') and \
+            poi['Text4'].startswith('-<') and poi['Text4'].endswith('>-'):
+        marker_icon = poi['Text4'][2:-2]
+        if marker_icon in allowed_icons:
+            poi['icon'] = 'icons/marker_{}.png'.format(marker_icon)
+            return " ".join([poi['Text1'], poi['Text2'], poi['Text3']])
 
 
 renders["day"] = {

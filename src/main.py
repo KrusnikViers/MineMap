@@ -8,12 +8,16 @@ import time
 from rebuild import RebuildException, OverviewerMapBuilder
 from settings import LOG_FILE_PATH, HISTORY_FILE_PATH
 
-web_server_process = subprocess.Popen(['nginx'])
-with open('/configuration.json') as configuration_file:
-    configuration = json.load(configuration_file)
-    period = int(configuration['update_period']) * 3600
-    map_builder = OverviewerMapBuilder(configuration)
+try:
+    with open(CONFIGURATION_FILEPATH) as configuration_file:
+        configuration = json.load(configuration_file)
+        period = int(configuration['update_period']) * 3600
+        map_builder = OverviewerMapBuilder(configuration)
+except FileNotFoundError:
+    print("Configuration file was not found. Please, check the documentation on how to mount the file.")
+    exit(1)
 
+web_server_process = subprocess.Popen(['nginx'])
 
 def _print_history(rebuild_start_time, rebuild_end_time, rebuild_result):
     previous_history = []
@@ -39,6 +43,8 @@ while True:
 
     try:
         subprocess.run('rm -rf {}'.format(LOG_FILE_PATH), shell=True)
+        subprocess.run('apt-get update', shell=True)
+        subprocess.run('apt-get install --only-upgrade minecraft-overviewer', shell=True)
         map_builder.rebuild()
         current_rebuild_result = 'Finished without errors'
         print('Rebuild successfully finished')

@@ -16,7 +16,7 @@ Configuration file parameters:
 * `name`: Realm name.
 * `update_period`: Minimum update period, in hours.
 
-Default docker run command: `docker run -d -v [path/to/host/public]:/public -v [path/to/configuration.json]:/configuration.json --name minemap-instance --restart always -p 80:80 viers/minemap`,
+Default docker run command: `docker run -d -v [path/to/host/public]:/public -v [path/to/configuration.json]:/configuration.json --name minemap --restart always -p 80:80 --cpu-shares 512 viers/minemap`,
 where:
 
 * `-d` - Detach after launch. To see logs, use `docker logs --follow minemap-instance`.
@@ -24,6 +24,7 @@ where:
 * `--name` - Container name.
 * `--restart` - Restarting policy. 
 * `-p` - Port mapping.
+* `--cpu-shares 512` - reduce CPU priority of the container, so that map rebuild process would not block other containers on a server.
 
 ### Building
 Default build command: `docker build --no-cache --force-rm -t minemap-image .`

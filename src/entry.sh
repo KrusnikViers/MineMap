@@ -1,9 +1,6 @@
 #!/bin/bash
-
-if [ -s "/configuration.json" ]
-then
-    cd /src
+cd /src
+while :
+do
     python -u ./main.py
-else
-   echo "Configuration file is empty!"
-fi
+done

@@ -43,8 +43,6 @@ while True:
 
     try:
         subprocess.run('rm -rf {}'.format(LOG_FILE_PATH), shell=True)
-        subprocess.run('apt-get update', shell=True)
-        subprocess.run('apt-get install --only-upgrade minecraft-overviewer', shell=True)
         map_builder.rebuild()
         current_rebuild_result = 'Finished without errors'
         print('Rebuild successfully finished')

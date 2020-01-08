@@ -134,8 +134,8 @@ class OverviewerMapBuilder:
     @staticmethod
     def _rebuild_map():
         _execute_sequence([
-            'overviewer.py --config=/src/overviewer_config.py >> {}'.format(LOG_FILE_PATH),
-            'overviewer.py --config=/src/overviewer_config.py --genpoi >> {}'.format(LOG_FILE_PATH),
+            '/overviewer/overviewer.py --config=/src/overviewer_config.py >> {}'.format(LOG_FILE_PATH),
+            '/overviewer/overviewer.py --config=/src/overviewer_config.py --genpoi >> {}'.format(LOG_FILE_PATH),
             'rm -rf /build/world*'
         ])
 

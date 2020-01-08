@@ -2,5 +2,5 @@
 cd /src
 while :
 do
-    python -u ./main.py
+    python3 -u ./main.py
 done

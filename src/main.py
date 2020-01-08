@@ -6,10 +6,10 @@ import subprocess
 import time
 
 from rebuild import RebuildException, OverviewerMapBuilder
-from settings import LOG_FILE_PATH, HISTORY_FILE_PATH
+from settings import CONFIGURATION_FILE_PATH, LOG_FILE_PATH, HISTORY_FILE_PATH
 
 try:
-    with open(CONFIGURATION_FILEPATH) as configuration_file:
+    with open(CONFIGURATION_FILE_PATH) as configuration_file:
         configuration = json.load(configuration_file)
         period = int(configuration['update_period']) * 3600
         map_builder = OverviewerMapBuilder(configuration)

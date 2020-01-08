@@ -5,13 +5,13 @@ EXPOSE 80
 # Build overviewer from sources on the particular commit.
 RUN apt-get update                                                      && \
     apt-get install -y                                                     \
-        nginx                                                              \
         python3                                                            \
         build-essential                                                    \
         python3-pip                                                        \
         python3-pillow                                                     \
         python3-numpy                                                      \
         git                                                             && \
+    pip3 install --no-cache-dir --upgrade requests==2.19                && \
     mkdir /overviewer                                                   && \
     cd /overviewer                                                      && \
     git clone https://github.com/overviewer/Minecraft-Overviewer.git .  && \
@@ -29,7 +29,8 @@ RUN apt-get update                                                      && \
 COPY src /src
 
 # Create working directories and set up nginx
-RUN rm /etc/nginx/sites-enabled/default           && \
+RUN apt-get install -y nginx                      && \
+    rm /etc/nginx/sites-enabled/default           && \
     echo 'daemon off;' >> /etc/nginx/nginx.conf   && \
     mv /src/server.nginx /etc/nginx/sites-enabled && \
     mkdir -p /public /build

@@ -1,4 +1,4 @@
-from observer import JSObserver
+from .observer import JSObserver
 
 worlds["default"] = "/build/world"
 texturepath = "/build/client.jar"

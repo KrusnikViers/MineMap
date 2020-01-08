@@ -5,6 +5,7 @@ EXPOSE 80
 # Build overviewer from sources on the particular commit.
 RUN apt-get update                                                      && \
     apt-get install -y                                                     \
+        nginx                                                              \
         python3                                                            \
         build-essential                                                    \
         python3-pip                                                        \
@@ -29,8 +30,7 @@ RUN apt-get update                                                      && \
 COPY src /src
 
 # Create working directories and set up nginx
-RUN apt-get install -y nginx                      && \
-    rm /etc/nginx/sites-enabled/default           && \
+RUN rm /etc/nginx/sites-enabled/default           && \
     echo 'daemon off;' >> /etc/nginx/nginx.conf   && \
     mv /src/server.nginx /etc/nginx/sites-enabled && \
     mkdir -p /public /build

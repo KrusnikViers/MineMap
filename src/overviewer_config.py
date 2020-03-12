@@ -29,12 +29,39 @@ def poi_filter(poi):
             return " ".join([poi['Text1'], poi['Text2'], poi['Text3']])
 
 
-renders["day"] = {
-    "world": "default",
+renders["day-SE"] = {
+    "world": "default south-east",
     "title": "Overworld",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
     "northdirection": "upper-right",
+    "markers": [dict(name="Manual", filterFunction=poi_filter)],
+}
+
+renders["day-NE"] = {
+    "world": "default north-east",
+    "title": "Overworld",
+    "rendermode": "smooth_lighting",
+    "dimension": "overworld",
+    "northdirection": "lower-right",
+    "markers": [dict(name="Manual", filterFunction=poi_filter)],
+}
+
+renders["day-NW"] = {
+    "world": "default north-west",
+    "title": "Overworld",
+    "rendermode": "smooth_lighting",
+    "dimension": "overworld",
+    "northdirection": "lower-left",
+    "markers": [dict(name="Manual", filterFunction=poi_filter)],
+}
+
+renders["day-SW"] = {
+    "world": "default south-west",
+    "title": "Overworld",
+    "rendermode": "smooth_lighting",
+    "dimension": "overworld",
+    "northdirection": "upper-left",
     "markers": [dict(name="Manual", filterFunction=poi_filter)],
 }
 

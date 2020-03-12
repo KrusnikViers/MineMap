@@ -1,6 +1,6 @@
 from .observer import JSObserver
 
-worlds["default"] = "/build/world"
+worlds["Realm"] = "/build/world"
 texturepath = "/build/client.jar"
 
 
@@ -30,8 +30,8 @@ def poi_filter(poi):
 
 
 renders["day-SE"] = {
-    "world": "default south-east",
-    "title": "Overworld",
+    "world": "Realm",
+    "title": "Overworld-SE",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
     "northdirection": "upper-right",
@@ -39,8 +39,8 @@ renders["day-SE"] = {
 }
 
 renders["day-NE"] = {
-    "world": "default north-east",
-    "title": "Overworld",
+    "world": "Realm",
+    "title": "Overworld-NE",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
     "northdirection": "lower-right",
@@ -48,8 +48,8 @@ renders["day-NE"] = {
 }
 
 renders["day-NW"] = {
-    "world": "default north-west",
-    "title": "Overworld",
+    "world": "Realm",
+    "title": "Overworld-NW",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
     "northdirection": "lower-left",
@@ -57,8 +57,8 @@ renders["day-NW"] = {
 }
 
 renders["day-SW"] = {
-    "world": "default south-west",
-    "title": "Overworld",
+    "world": "Realm",
+    "title": "Overworld-SW",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
     "northdirection": "upper-left",
@@ -66,7 +66,7 @@ renders["day-SW"] = {
 }
 
 renders["nether"] = {
-    "world": "default",
+    "world": "Realm",
     "title": "Nether",
     "rendermode": [Base(), EdgeLines(), Nether(), SmoothLighting(strength=0.4)],
     "dimension": "nether",
@@ -75,7 +75,7 @@ renders["nether"] = {
 }
 
 renders["end"] = {
-    "world": "default",
+    "world": "Realm",
     "title": "The End",
     "rendermode": [Base(), EdgeLines(), SmoothLighting(strength=0.5)],
     "dimension": "end",

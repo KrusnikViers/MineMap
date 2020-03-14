@@ -24,7 +24,8 @@ where:
 * `--name` - Container name.
 * `--restart` - Restarting policy. 
 * `-p` - Port mapping.
-* `--cpu-shares 512` - reduce CPU priority of the container, so that map rebuild process would not block other containers on a server.
+* `--cpu-shares 512` - reduce CPU priority of the container, so that map rebuild process would not block other containers on a server (default value of the parameter is 1024).
+* `--memory=1200m` - restrict RAM usage of the container (to 1200M in example)
 
 ### Building
 Default build command: `docker build --no-cache --force-rm -t minemap-image .`

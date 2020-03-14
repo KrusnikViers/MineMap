@@ -27,6 +27,11 @@ where:
 * `--cpu-shares 512` - reduce CPU priority of the container, so that map rebuild process would not block other containers on a server (default value of the parameter is 1024).
 * `--memory=1200m` - restrict RAM usage of the container (to 1200M in example)
 
+### Custom rendering configuration
+Image provides default configuration for rendering. To tweak it, you could copy default configuration
+[src/default_render_config.py], make all neccessary changes and mount the file during the container launch with
+parameter `-v [path/to/custom/configuration]:/render_config.py`
+
 ### Building
 Default build command: `docker build --no-cache --force-rm -t minemap-image .`
 

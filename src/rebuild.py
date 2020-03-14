@@ -6,8 +6,7 @@ import subprocess
 import time
 
 import requests
-
-from settings import MINECRAFT_CLIENT_PATH, WORLD_BACKUP_PATH, LOG_FILE_PATH
+from settings import MINECRAFT_CLIENT_PATH, WORLD_BACKUP_PATH, LOG_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH
 
 
 class RebuildException(Exception):
@@ -134,8 +133,9 @@ class OverviewerMapBuilder:
     @staticmethod
     def _rebuild_map():
         _execute_sequence([
-            '/overviewer/overviewer.py --config=/src/overviewer_config.py >> {}'.format(LOG_FILE_PATH),
-            '/overviewer/overviewer.py --config=/src/overviewer_config.py --genpoi >> {}'.format(LOG_FILE_PATH),
+            '/overviewer/overviewer.py --config={0} >> {1}'.format(RENDER_CONFIGURATION_FILE_PATH, LOG_FILE_PATH),
+            '/overviewer/overviewer.py --config={0} --genpoi >> {1}'.format(RENDER_CONFIGURATION_FILE_PATH,
+                                                                            LOG_FILE_PATH),
             'rm -rf /build/world*'
         ])
 

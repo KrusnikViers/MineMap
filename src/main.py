@@ -2,11 +2,13 @@
 import datetime
 import json
 import os
+import shutil
 import subprocess
 import time
 
 from rebuild import RebuildException, OverviewerMapBuilder
-from settings import CONFIGURATION_FILE_PATH, LOG_FILE_PATH, HISTORY_FILE_PATH
+from settings import CONFIGURATION_FILE_PATH, LOG_FILE_PATH, HISTORY_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH, \
+    DEFAULT_RENDER_CONFIGURATION_FILE_PATH
 
 try:
     with open(CONFIGURATION_FILE_PATH) as configuration_file:
@@ -16,6 +18,12 @@ try:
 except FileNotFoundError:
     print("Configuration file was not found. Please, check the documentation on how to mount the file.")
     exit(1)
+
+if not os.path.exists(RENDER_CONFIGURATION_FILE_PATH):
+    print("Custom render configuration file was not provided, use default one")
+    shutil.copyfile(DEFAULT_RENDER_CONFIGURATION_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH)
+else:
+    print("Custom render configuration file found")
 
 web_server_process = subprocess.Popen(['nginx'])
 

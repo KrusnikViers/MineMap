@@ -20,22 +20,20 @@
 #metainformation {
     position: absolute;
     float: left;
-    width: 200px;
+    margin: 0;
+    padding: 0 5px;
     bottom: 0px;
-    color: #ffffff;
-    font-size: 10pt;
+    font-size: 11px;
+    background-color: rgba(255, 255, 255, 0.7);
 }
 </style>
 
 </head>
 
 <div id="metainformation">
-    <ul>
-        <li>Map generated at: {time}</li>
-        <li>Overviewer version: {version}</li>
-        <li><a href="/updates.txt">Updates list</a></li>
-        <li><a href="/log.txt">Last rendering log</a></li>
-    </ul>
+    {time} <br/>
+    <a href="/updates.txt">Updates list</a> <br/>
+    <a href="/log.txt">Rendering log</a> <br/>
 </div>
 
 <!-- Generated at: {time} -->

@@ -13,10 +13,20 @@ class RebuildException(Exception):
     pass
 
 
+def _retry_on_timeout(lambda_f):
+    timeout_minutes = 15
+    while True:
+        try:
+            return lambda_f()
+        except requests.exceptions.Timeout as e:
+            print('Timeout is reached during network call; retrying in {} minutes...'.format(timeout_minutes))
+            time.sleep(timeout_minutes * 60)
+
+
 # Download file from |url| to |location|
 def _download_to_file(url: str, location: str):
     os.makedirs(os.path.dirname(location), exist_ok=True)
-    download_request = requests.get(url, stream=True)
+    download_request = _retry_on_timeout(lambda: requests.get(url, stream=True, timeout=60))
     if download_request.status_code != 200:
         raise RebuildException('Download from {} to {} failed: {}'.format(url, location, str(download_request)))
     with open(location, 'wb') as output_file:
@@ -27,9 +37,9 @@ def _download_to_file(url: str, location: str):
 # GET or POST request on specified url, expects JSON as an answer.
 def _get_json(url: str, post_body=None, cookies=None):
     if post_body:
-        current_request = requests.post(url, post_body, cookies=cookies)
+        current_request = _retry_on_timeout(lambda: requests.post(url, post_body, cookies=cookies, timeout=60))
     else:
-        current_request = requests.get(url, cookies=cookies)
+        current_request = _retry_on_timeout(lambda: requests.get(url, cookies=cookies, timeout=60))
 
     try:
         return json.loads(current_request.text)

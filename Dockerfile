@@ -12,7 +12,7 @@ RUN apt-get update                                                      && \
         python3-pillow                                                     \
         python3-numpy                                                      \
         git                                                             && \
-    pip3 install --no-cache-dir --upgrade requests==2.19                && \
+    pip3 install --no-cache-dir --upgrade requests==2.23                && \
     mkdir /overviewer                                                   && \
     cd /overviewer                                                      && \
     git clone https://github.com/overviewer/Minecraft-Overviewer.git .  && \

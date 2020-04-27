@@ -40,7 +40,7 @@ def _print_history(rebuild_start_time, rebuild_end_time, rebuild_result):
                       'duration': str(rebuild_end_time - rebuild_start_time),
                       'result': str(rebuild_result)}
     with open(HISTORY_FILE_PATH, 'w') as version_file:
-        json.dump({'history': previous_history[:99] + [current_record]}, version_file, indent='  ')
+        json.dump({'history': [current_record] + previous_history[:99]}, version_file, indent='  ')
 
 
 # Main process exists in endless cycle, until container is stopped from the outside.

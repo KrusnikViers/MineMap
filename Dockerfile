@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 EXPOSE 80
 
-# Build overviewer from sources on the particular commit.
+# Rebuild overviewer from the last commit.
 RUN apt-get update                                                      && \
     apt-get install -y                                                     \
         nginx                                                              \
@@ -16,7 +16,6 @@ RUN apt-get update                                                      && \
     mkdir /overviewer                                                   && \
     cd /overviewer                                                      && \
     git clone https://github.com/overviewer/Minecraft-Overviewer.git .  && \
-    git reset --hard 98fe552790fbb0deee1340b873f7dfb28e62c4c6           && \
     python3 setup.py build                                              && \
     apt-get purge -y                                                       \
         build-essential                                                    \

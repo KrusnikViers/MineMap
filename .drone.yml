@@ -1,0 +1,19 @@
+kind: pipeline
+name: master
+trigger:
+  branch:
+  - master
+  event:
+  - cron
+  - push
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/minemap
+    tags:
+      - latest

@@ -1,7 +1,6 @@
 from .observer import JSObserver
 
 worlds["Realm"] = "/build/world"
-texturepath = "/build/client.jar"
 customwebassets = "/src/custom_web_assets"
 
 

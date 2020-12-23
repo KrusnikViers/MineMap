@@ -6,7 +6,7 @@ import subprocess
 import time
 
 import requests
-from settings import MINECRAFT_CLIENT_PATH, WORLD_BACKUP_PATH, LOG_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH
+from settings import WORLD_BACKUP_PATH, LOG_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH
 
 
 class RebuildException(Exception):
@@ -32,6 +32,7 @@ def _download_to_file(url: str, location: str):
     with open(location, 'wb') as output_file:
         download_request.raw.decode_content = True
         shutil.copyfileobj(download_request.raw, output_file)
+    print('Download complete: {} to {}'.format(url, location))
 
 
 # GET or POST request on specified url, expects JSON as an answer.
@@ -66,23 +67,16 @@ class OverviewerMapBuilder:
         self.authorised_cookies = None
 
     @staticmethod
-    def _get_latest_version_id_and_manifest() -> (str, str):
+    def _get_latest_version_id() -> str:
         version_data = _get_json('https://launchermeta.mojang.com/mc/game/version_manifest.json')
-        if not 'versions' in version_data:
-            raise RebuildException('Bad client versions list: {}'.format(version_data))
-        latest_version = version_data['versions'][0]
-        return latest_version['id'], latest_version['url']
+        return version_data['latest']['release']
 
-    def _update_current_client(self, client_id, manifest_url):
-        # Remove old client, if any.
-        if os.path.exists(MINECRAFT_CLIENT_PATH):
-            _execute_sequence(['rm -f {}'.format(MINECRAFT_CLIENT_PATH)])
-
-        client_manifest = _get_json(manifest_url)
-        if 'downloads' not in client_manifest:
-            raise RebuildException('Bad client manifest: {}'.format(client_manifest))
-        _download_to_file(client_manifest['downloads']['client']['url'], MINECRAFT_CLIENT_PATH)
-
+    def _update_current_client(self, client_id):
+        # Remove old clients, if any.
+        _execute_sequence(['rm -rf  ~/.minecraft/versions/* || true',
+                           'mkdir -p ~/.minecraft/versions/{}'.format(client_id)])
+        _download_to_file('https://overviewer.org/textures/{}'.format(client_id),
+                          '~/.minecraft/versions/{0}/{0}.jar'.format(client_id))
         self.current_client = client_id
 
     def _update_authorised_cookies(self):
@@ -151,10 +145,10 @@ class OverviewerMapBuilder:
 
     def rebuild(self):
         print('Requesting current client version...')
-        current_client_version, manifest_url = self._get_latest_version_id_and_manifest()
+        current_client_version = self._get_latest_version_id()
         if self.current_client != current_client_version:
             print('Updating current client...')
-            self._update_current_client(current_client_version, manifest_url)
+            self._update_current_client(current_client_version)
 
         backup_link = None
         # Try to use previous token:

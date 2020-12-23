@@ -1,7 +1,7 @@
 # MineMap
 Online self-updating map for official minecraft realms.
 
-[![Docker Build Status](https://img.shields.io/docker/build/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
+[![Build Status](https://cloud.drone.io/api/badges/KrusnikViers/MineMap/status.svg)](https://cloud.drone.io/KrusnikViers/MineMap)
 [![Docker Pulls](https://img.shields.io/docker/pulls/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
 [![MicroBadger Size](https://images.microbadger.com/badges/image/viers/minemap.svg)](https://hub.docker.com/r/viers/minemap/)
 

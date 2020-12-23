@@ -6,7 +6,7 @@ import subprocess
 import time
 
 import requests
-from settings import WORLD_BACKUP_PATH, LOG_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH
+from settings import MINECRAFT_TEXTURES_PATH, WORLD_BACKUP_PATH, LOG_FILE_PATH, RENDER_CONFIGURATION_FILE_PATH
 
 
 class RebuildException(Exception):
@@ -73,10 +73,8 @@ class OverviewerMapBuilder:
 
     def _update_current_client(self, client_id):
         # Remove old clients, if any.
-        _execute_sequence(['rm -rf  ~/.minecraft/versions/* || true',
-                           'mkdir -p ~/.minecraft/versions/{}'.format(client_id)])
-        _download_to_file('https://overviewer.org/textures/{}'.format(client_id),
-                          '~/.minecraft/versions/{0}/{0}.jar'.format(client_id))
+        _execute_sequence(['rm -f  {}'.format(MINECRAFT_TEXTURES_PATH)])
+        _download_to_file('https://overviewer.org/textures/{}'.format(client_id), MINECRAFT_TEXTURES_PATH)
         self.current_client = client_id
 
     def _update_authorised_cookies(self):

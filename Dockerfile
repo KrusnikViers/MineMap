@@ -16,6 +16,8 @@ RUN apt-get update                                                      && \
     mkdir /overviewer                                                   && \
     cd /overviewer                                                      && \
     git clone https://github.com/overviewer/Minecraft-Overviewer.git .  && \
+    git checkout master && git pull origin master                       && \
+    git rev-parse --short HEAD                                          && \
     python3 setup.py build                                              && \
     apt-get purge -y                                                       \
         build-essential                                                    \

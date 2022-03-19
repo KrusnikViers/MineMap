@@ -58,6 +58,7 @@ renders["end"] = {
 }
 
 outputdir = "/public"
+rerenderprob = 0.10
 
 observer = JSObserver(outputdir, 30, {'totalTiles': 'Rendering %d tiles...',
                                       'renderCompleted': 'Rendered in %02d:%02d:%02d',
